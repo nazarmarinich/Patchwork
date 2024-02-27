@@ -7,39 +7,72 @@ patches = [26, 32, 38, 44, 50]
 timeline = np.arange(1, 54)
 
 patchwork_pieces = [
-    {"ID": 0, "Name": "ladder", "Square": 5, "Buttons": 3, "Cost_b": 10, "Cost_t": 4, 'Weight': 0.0},
-    {"ID": 1, "Name": "corner5", "Square": 5, "Buttons": 2, "Cost_b": 10, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 2, "Name": "corner10", "Square": 4, "Buttons": 2, "Cost_b": 4, "Cost_t": 6, 'Weight': 0.0},
-    {"ID": 3, "Name": "line3", "Square": 3, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 4, "Name": "strange6", "Square": 6, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0},
-    {"ID": 5, "Name": "line4", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 6, "Name": "z2", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 7, "Name": "cross4", "Square": 7, "Buttons": 1, "Cost_b": 1, "Cost_t": 4, 'Weight': 0.0},
-    {"ID": 8, "Name": "line5", "Square": 5, "Buttons": 1, "Cost_b": 7, "Cost_t": 1, 'Weight': 0.0},
-    {"ID": 9, "Name": "square", "Square": 4, "Buttons": 2, "Cost_b": 6, "Cost_t": 5, 'Weight': 0.0},
-    {"ID": 10, "Name": "trapez7", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 4, 'Weight': 0.0},
-    {"ID": 11, "Name": "corner2", "Square": 4, "Buttons": 1, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 12, "Name": "fatz", "Square": 6, "Buttons": 0, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 13, "Name": "z8", "Square": 8, "Buttons": 3, "Cost_b": 8, "Cost_t": 6, 'Weight': 0.0},
-    {"ID": 14, "Name": "n", "Square": 5, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 15, "Name": "cross0", "Square": 6, "Buttons": 1, "Cost_b": 0, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 16, "Name": "z5", "Square": 5, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 17, "Name": "corner3", "Square": 3, "Buttons": 0, "Cost_b": 3, "Cost_t": 1, 'Weight': 0.0},
-    {"ID": 18, "Name": "z7", "Square": 4, "Buttons": 3, "Cost_b": 7, "Cost_t": 6, 'Weight': 0.0},
-    {"ID": 19, "Name": "corner1", "Square": 3, "Buttons": 0, "Cost_b": 1, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 20, "Name": "corner4", "Square": 5, "Buttons": 1, "Cost_b": 3, "Cost_t": 4, 'Weight': 0.0},
-    {"ID": 21, "Name": "longz", "Square": 5, "Buttons": 1, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 22, "Name": "bigt", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 23, "Name": "smallt", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 5, 'Weight': 0.0},
-    {"ID": 24, "Name": "hugez", "Square": 6, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 25, "Name": "line2", "Square": 2, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0},
-    {"ID": 26, "Name": "trapez2", "Square": 4, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0},
-    {"ID": 27, "Name": "H", "Square": 7, "Buttons": 0, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 28, "Name": "trapez8", "Square": 8, "Buttons": 1, "Cost_b": 5, "Cost_t": 3, 'Weight': 0.0},
-    {"ID": 29, "Name": "corner6", "Square": 6, "Buttons": 3, "Cost_b": 10, "Cost_t": 5, 'Weight': 0.0},
-    {"ID": 30, "Name": "longn", "Square": 6, "Buttons": 1, "Cost_b": 1, "Cost_t": 5, 'Weight': 0.0},
-    {"ID": 31, "Name": "zz", "Square": 6, "Buttons": 2, "Cost_b": 3, "Cost_t": 6, 'Weight': 0.0},
-    {"ID": 32, "Name": "cross5", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 4, 'Weight': 0.0},
+    {"ID": 0, "Name": "ladder", "Square": 5, "Buttons": 3, "Cost_b": 10, "Cost_t": 4, 'Weight': 0.0,
+     "Shape": [[1, 1, 0], [0, 1, 1], [0, 0, 1]]},
+    {"ID": 1, "Name": "corner5", "Square": 5, "Buttons": 2, "Cost_b": 10, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[1, 1, 1, 1], [0, 0, 0, 1]]},
+    {"ID": 2, "Name": "corner10", "Square": 4, "Buttons": 2, "Cost_b": 4, "Cost_t": 6, 'Weight': 0.0,
+     "Shape": [[1, 1, 1], [0, 0, 1]]},
+    {"ID": 3, "Name": "line3", "Square": 3, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 1]]},
+    {"ID": 4, "Name": "strange6", "Square": 6, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0,
+     "Shape": [[0, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 0]]},
+    {"ID": 5, "Name": "line4", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[1, 1, 1, 1]]},
+    {"ID": 6, "Name": "z2", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 0], [0, 1, 1]]},
+    {"ID": 7, "Name": "cross4", "Square": 7, "Buttons": 1, "Cost_b": 1, "Cost_t": 4, 'Weight': 0.0,
+     "Shape": [[0, 0, 1, 0, 0], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0]]},
+    {"ID": 8, "Name": "line5", "Square": 5, "Buttons": 1, "Cost_b": 7, "Cost_t": 1, 'Weight': 0.0,
+     "Shape": [[1, 1, 1, 1, 1]]},
+    {"ID": 9, "Name": "square", "Square": 4, "Buttons": 2, "Cost_b": 6, "Cost_t": 5, 'Weight': 0.0,
+     "Shape": [[1, 1], [1, 1]]},
+    {"ID": 10, "Name": "trapezia7", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 4, 'Weight': 0.0,
+     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1]]},
+    {"ID": 11, "Name": "corner2", "Square": 4, "Buttons": 1, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 1], [0, 0, 1]]},
+    {"ID": 12, "Name": "fat_z", "Square": 6, "Buttons": 0, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 1, 0], [0, 1, 1, 1]]},
+    {"ID": 13, "Name": "z8", "Square": 6, "Buttons": 3, "Cost_b": 8, "Cost_t": 6, 'Weight': 0.0,
+     "Shape": [[1, 0, 0], [1, 1, 1], [0, 1, 1]]},
+    {"ID": 14, "Name": "n", "Square": 5, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 1], [1, 0, 1]]},
+    {"ID": 15, "Name": "cross0", "Square": 6, "Buttons": 1, "Cost_b": 0, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]]},
+    {"ID": 16, "Name": "z5", "Square": 5, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 1, 1], [0, 1, 1]]},
+    {"ID": 17, "Name": "corner3", "Square": 3, "Buttons": 0, "Cost_b": 3, "Cost_t": 1, 'Weight': 0.0,
+     "Shape": [[1, 1], [0, 1]]},
+    {"ID": 18, "Name": "z7", "Square": 4, "Buttons": 3, "Cost_b": 7, "Cost_t": 6, 'Weight': 0.0,
+     "Shape": [[1, 1, 0], [0, 1, 1]]},
+    {"ID": 19, "Name": "corner1", "Square": 3, "Buttons": 0, "Cost_b": 1, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[1, 1], [0, 1]]},
+    {"ID": 20, "Name": "corner4", "Square": 5, "Buttons": 1, "Cost_b": 3, "Cost_t": 4, 'Weight': 0.0,
+     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1]]},
+    {"ID": 21, "Name": "long_z", "Square": 5, "Buttons": 1, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[1, 1, 0, 0], [0, 1, 1, 1]]},
+    {"ID": 22, "Name": "big_t", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [1, 0, 0, 0]]},
+    {"ID": 23, "Name": "small_t", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 5, 'Weight': 0.0,
+     "Shape": [[1, 0, 0], [1, 1, 1], [1, 0, 0]]},
+    {"ID": 24, "Name": "huge_z", "Square": 6, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 1]]},
+    {"ID": 25, "Name": "line2", "Square": 2, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0,
+     "Shape": [[1, 1]]},
+    {"ID": 26, "Name": "trapezia2", "Square": 4, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
+     "Shape": [[0, 1, 0], [1, 1, 1]]},
+    {"ID": 27, "Name": "H", "Square": 7, "Buttons": 0, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[1, 0, 1], [1, 1, 1], [1, 0, 1]]},
+    {"ID": 28, "Name": "trapezia8", "Square": 8, "Buttons": 1, "Cost_b": 5, "Cost_t": 3, 'Weight': 0.0,
+     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]]},
+    {"ID": 29, "Name": "corner6", "Square": 6, "Buttons": 3, "Cost_b": 10, "Cost_t": 5, 'Weight': 0.0,
+     "Shape": [[1, 1, 1, 1], [0, 0, 1, 1]]},
+    {"ID": 30, "Name": "long_n", "Square": 6, "Buttons": 1, "Cost_b": 1, "Cost_t": 5, 'Weight': 0.0,
+     "Shape": [[1, 0, 0, 1], [1, 1, 1, 1]]},
+    {"ID": 31, "Name": "zz", "Square": 6, "Buttons": 2, "Cost_b": 3, "Cost_t": 6, 'Weight': 0.0,
+     "Shape": [[0, 1, 0], [1, 1, 1], [1, 0, 1]]},
+    {"ID": 32, "Name": "cross5", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 4, 'Weight': 0.0,
+     "Shape": [[0, 1, 0], [1, 1, 1], [0, 1, 0]]},
 ]
 
 
@@ -52,6 +85,24 @@ class Player:
         self.tiles = []
         self.field = np.zeros((9, 9), dtype=int)
         self.square = 0
+
+    def place_tile(self, tile):
+        # for each rotate position
+        for _ in range(4):
+            tile_rows, tile_cols = tile.shape
+            mask = tile == 1
+            for row in range(9):
+                for col in range(9):
+                    # check if there is a place for a tile
+                    if row + tile_rows <= 9 and col + tile_cols <= 9:
+                        # check if it is possible to place
+                        if np.all(self.field[row:row + tile_rows, col:col + tile_cols][mask] == 0):
+                            self.field[row:row + tile_rows, col:col + tile_cols] += tile
+                            return not None
+            # rotate 90 degrees
+            tile = np.rot90(tile)
+
+        return None
 
     def greedy_sorting(self, tiles_to_sort):
         """
@@ -84,6 +135,8 @@ class Player:
         for tn in timeline[(53 - self.time_count):(53 - self.time_count + time_cost)]:
             if tn in patches:  # Check if the player time position is an aimed button position
                 self.square += 1
+                Player.place_tile(self, np.array([[1]]))
+                Player.print_turn_results(self, "99", "-", "-")
                 patches = np.delete(patches, 0)
 
     def calc_aimed_buttons(self, time_cost):
@@ -110,7 +163,6 @@ class Player:
 
 
 # _______________functions _______________________
-
 
 def print_board(board):
     """
@@ -152,7 +204,9 @@ def emulate_game():
                 for i in tiles_s[0:3]:
                     # for i in tiles[0:3]:
                     tile = patchwork_pieces[i]
-                    if player1.buttons >= tile['Cost_b'] and player1.time_count > 0:
+                    tile_to_place = np.array(tile['Shape'])
+                    if (player1.buttons >= tile['Cost_b'] and player1.time_count > 0
+                            and player1.place_tile(tile_to_place) is not None):
                         player1.tiles.append(tile)
                         tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
                         tiles = tiles[1::]
@@ -183,7 +237,9 @@ def emulate_game():
                 n = 0
                 for i in tiles[0:3]:
                     tile = patchwork_pieces[i]
-                    if player2.buttons >= tile['Cost_b'] and player2.time_count > 0:
+                    tile_to_place = np.array(tile['Shape'])
+                    if (player2.buttons >= tile['Cost_b'] and player2.time_count > 0
+                            and player2.place_tile(tile_to_place) is not None):
                         player2.tiles.append(tile)
                         tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
                         tiles = tiles[1::]
@@ -211,8 +267,8 @@ def emulate_game():
     print(tiles)
     print(calc_game_results(player1, player2, player))
 
-    # print(print_board(player1.field))
-
+    print(print_board(player1.field))
+    print(print_board(player2.field))
 
 if __name__ == '__main__':
     emulate_game()
