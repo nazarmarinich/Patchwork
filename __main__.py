@@ -1,8 +1,11 @@
 import numpy as np
 import math
+import pygame
 
+# Mode
+VISUAL = True
 # Bonus patches on the game timeline
-patches = [26, 32, 38, 44, 50]
+PATCHES = [26, 32, 38, 44, 50]
 # Game timeline
 timeline = np.arange(1, 54)
 
@@ -87,21 +90,23 @@ class Player:
         self.square = 0
 
     def place_tile(self, tile):
-        # for each rotate position
-        for _ in range(4):
-            tile_rows, tile_cols = tile.shape
-            mask = tile == 1
-            for row in range(9):
-                for col in range(9):
-                    # check if there is a place for a tile
-                    if row + tile_rows <= 9 and col + tile_cols <= 9:
-                        # check if it is possible to place
-                        if np.all(self.field[row:row + tile_rows, col:col + tile_cols][mask] == 0):
-                            self.field[row:row + tile_rows, col:col + tile_cols] += tile
-                            return not None
-            # rotate 90 degrees
-            tile = np.rot90(tile)
-
+        # mirroring
+        for _ in range(2):
+            # for each rotate position
+            for _ in range(4):
+                tile_rows, tile_cols = tile.shape
+                mask = tile == 1
+                for row in range(9):
+                    for col in range(9):
+                        # check if there is a place for a tile
+                        if row + tile_rows <= 9 and col + tile_cols <= 9:
+                            # check if it is possible to place
+                            if np.all(self.field[row:row + tile_rows, col:col + tile_cols][mask] == 0):
+                                self.field[row:row + tile_rows, col:col + tile_cols] += tile
+                                return not None
+                # rotate 90 degrees
+                tile = np.rot90(tile)
+            tile = np.fliplr(tile)
         return None
 
     def greedy_sorting(self, tiles_to_sort):
@@ -126,18 +131,17 @@ class Player:
         """
         Calculate if the player aimed a patch based on the timeline position.
         Args:
-        - time_position (int): Current position on the timeline.
         - time_cost (int): Time cost of the tile being placed.
         Returns:
         - square_sum (int): Updated number of square
         """
-        global patches
+        global PATCHES
         for tn in timeline[(53 - self.time_count):(53 - self.time_count + time_cost)]:
-            if tn in patches:  # Check if the player time position is an aimed button position
+            if tn in PATCHES:  # Check if the player time position is an aimed button position
                 self.square += 1
                 Player.place_tile(self, np.array([[1]]))
                 Player.print_turn_results(self, "99", "-", "-")
-                patches = np.delete(patches, 0)
+                PATCHES = np.delete(PATCHES, 0)
 
     def calc_aimed_buttons(self, time_cost):
         """
@@ -176,20 +180,20 @@ def calc_game_results(player1, player2, player):
     p1_result = player1.buttons - (81 - min(player1.square, 81)) * 2
     p2_result = player2.buttons - (81 - min(player2.square, 81)) * 2
     if p1_result > p2_result:
-        print("\n" + "Результат игрока 1: " + str(p1_result) + "\n" + "Результат игрока 2: " + str(
-            p2_result) + "\n" + "Победил игрок 1!")
+        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+            p2_result) + "\nПобедил игрок 1!")
     elif p1_result == p2_result and player == 1:
-        print("\n" + "Результат игрока 1: " + str(p1_result) + "\n" + "Результат игрока 2: " + str(
-            p2_result) + "\n" + "Победил игрок 1!")
+        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+            p2_result) + "\nПобедил игрок 1!")
     else:
-        print("\n" + "Результат игрока 1: " + str(p1_result) + "\n" + "Результат игрока 2: " + str(
-            p2_result) + "\n" + "Победил игрок 2!")
+        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+            p2_result) + "\nПобедил игрок 2!")
 
 
 def emulate_game():
     player1 = Player(1)
     player2 = Player(2)
-    # Patches order
+    # patches order
     tiles = np.arange(0, 33)
     # np.random.shuffle(tiles)
 
@@ -235,6 +239,9 @@ def emulate_game():
             # print(tiles)
             while player2.time_count >= player1.time_count:
                 n = 0
+                # Player 2 uses greedy sorting
+                # tiles_s = player1.greedy_sorting(tiles[0:3])
+                # for i in tiles_s[0:3]:
                 for i in tiles[0:3]:
                     tile = patchwork_pieces[i]
                     tile_to_place = np.array(tile['Shape'])
@@ -270,5 +277,27 @@ def emulate_game():
     print(print_board(player1.field))
     print(print_board(player2.field))
 
+
+def visual_run():
+    pygame.init()
+    pro_version = "1.0.0"
+    sc = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+    pygame.display.set_caption("Patchwork MNG " + pro_version)
+    # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
+    clock = pygame.time.Clock()
+    FPS = 60
+    WHITE = (255, 255, 255)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+        clock.tick(FPS)
+
 if __name__ == '__main__':
-    emulate_game()
+    if VISUAL is True:
+        visual_run()
+    else:
+        emulate_game()
+
+
