@@ -1,9 +1,12 @@
 import numpy as np
 import math
 import pygame
+import uuid
 
 # Mode
-VISUAL = True
+VISUAL = False
+RANDOM = False
+TILES = np.arange(0, 33)
 # Bonus patches on the game timeline
 PATCHES = [26, 32, 38, 44, 50]
 # Game timeline
@@ -77,6 +80,17 @@ patchwork_pieces = [
     {"ID": 32, "Name": "cross5", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 4, 'Weight': 0.0,
      "Shape": [[0, 1, 0], [1, 1, 1], [0, 1, 0]]},
 ]
+
+
+class Game:
+    def __init__(self, visual, tiles):
+        self.id = uuid.uuid4().hex
+        self.visual = visual
+        self.patches = [26, 32, 38, 44, 50]
+        self.timeline = np.arange(1, 54)
+        self.player1 = Player(1)
+        self.player2 = Player(2)
+        self.tiles = tiles_shuffle(tiles)
 
 
 class Player:
@@ -168,6 +182,14 @@ class Player:
 
 # _______________functions _______________________
 
+def tiles_shuffle(tiles):
+    if RANDOM:
+        np.random.shuffle(tiles)
+    while tiles[32] != 25:
+        tiles = np.roll(tiles, 1)
+    return tiles
+
+
 def print_board(board):
     """
     Print the game board.
@@ -194,13 +216,12 @@ def emulate_game():
     player1 = Player(1)
     player2 = Player(2)
     # patches order
-    tiles = np.arange(0, 33)
-    # np.random.shuffle(tiles)
+    tiles = tiles_shuffle(TILES)
 
     player = 1
     while player1.time_count + player2.time_count > 0:
         if player == 1:
-            # print(tiles)
+            print(tiles)
             while player1.time_count >= player2.time_count:
                 n = 0
                 # Player 1 uses greedy sorting
@@ -285,19 +306,25 @@ def visual_run():
     pygame.display.set_caption("Patchwork MNG " + pro_version)
     # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
     clock = pygame.time.Clock()
-    FPS = 60
-    WHITE = (255, 255, 255)
+    fps = 60
+    # WHITE = (255, 255, 255)
+
+    player1_board = pygame.Surface((270, 270))
+    player2_board = pygame.Surface((270, 270))
+    player1_board.fill('Grey')
+    player2_board.fill('Grey')
+    sc.blit(player1_board, (50, 50))
+    sc.blit(player2_board, (350, 50))
+    pygame.display.update()
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-        clock.tick(FPS)
+        clock.tick(fps)
 
 if __name__ == '__main__':
     if VISUAL is True:
         visual_run()
     else:
         emulate_game()
-
-
