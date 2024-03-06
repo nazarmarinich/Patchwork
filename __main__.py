@@ -2,11 +2,14 @@ import numpy as np
 import math
 import pygame
 import uuid
+import random
 
 # Mode
-VISUAL = False
-RANDOM = False
+VISUAL = True
+RANDOM = True
 TILES = np.arange(0, 33)
+WHITE = (255, 255, 255)
+
 # Bonus patches on the game timeline
 PATCHES = [26, 32, 38, 44, 50]
 # Game timeline
@@ -14,83 +17,126 @@ timeline = np.arange(1, 54)
 
 patchwork_pieces = [
     {"ID": 0, "Name": "ladder", "Square": 5, "Buttons": 3, "Cost_b": 10, "Cost_t": 4, 'Weight': 0.0,
-     "Shape": [[1, 1, 0], [0, 1, 1], [0, 0, 1]]},
+     "Shape": [[1, 1, 0], [0, 1, 1], [0, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 1, "Name": "corner5", "Square": 5, "Buttons": 2, "Cost_b": 10, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[1, 1, 1, 1], [0, 0, 0, 1]]},
+     "Shape": [[1, 1, 1, 1], [0, 0, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 2, "Name": "corner10", "Square": 4, "Buttons": 2, "Cost_b": 4, "Cost_t": 6, 'Weight': 0.0,
-     "Shape": [[1, 1, 1], [0, 0, 1]]},
+     "Shape": [[1, 1, 1], [0, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 3, "Name": "line3", "Square": 3, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 1]]},
+     "Shape": [[1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 4, "Name": "strange6", "Square": 6, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0,
-     "Shape": [[0, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 0]]},
+     "Shape": [[0, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 0]], "Color": (0, 0, 0)},
     {"ID": 5, "Name": "line4", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[1, 1, 1, 1]]},
+     "Shape": [[1, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 6, "Name": "z2", "Square": 4, "Buttons": 1, "Cost_b": 3, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 0], [0, 1, 1]]},
+     "Shape": [[1, 1, 0], [0, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 7, "Name": "cross4", "Square": 7, "Buttons": 1, "Cost_b": 1, "Cost_t": 4, 'Weight': 0.0,
-     "Shape": [[0, 0, 1, 0, 0], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0]]},
+     "Shape": [[0, 0, 1, 0, 0], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0]], "Color": (0, 0, 0)},
     {"ID": 8, "Name": "line5", "Square": 5, "Buttons": 1, "Cost_b": 7, "Cost_t": 1, 'Weight': 0.0,
-     "Shape": [[1, 1, 1, 1, 1]]},
+     "Shape": [[1, 1, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 9, "Name": "square", "Square": 4, "Buttons": 2, "Cost_b": 6, "Cost_t": 5, 'Weight': 0.0,
-     "Shape": [[1, 1], [1, 1]]},
+     "Shape": [[1, 1], [1, 1]], "Color": (0, 0, 0)},
     {"ID": 10, "Name": "trapezia7", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 4, 'Weight': 0.0,
-     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1]]},
+     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 11, "Name": "corner2", "Square": 4, "Buttons": 1, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 1], [0, 0, 1]]},
+     "Shape": [[1, 1, 1], [0, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 12, "Name": "fat_z", "Square": 6, "Buttons": 0, "Cost_b": 4, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 1, 0], [0, 1, 1, 1]]},
+     "Shape": [[1, 1, 1, 0], [0, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 13, "Name": "z8", "Square": 6, "Buttons": 3, "Cost_b": 8, "Cost_t": 6, 'Weight': 0.0,
-     "Shape": [[1, 0, 0], [1, 1, 1], [0, 1, 1]]},
+     "Shape": [[1, 0, 0], [1, 1, 1], [0, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 14, "Name": "n", "Square": 5, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 1], [1, 0, 1]]},
+     "Shape": [[1, 1, 1], [1, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 15, "Name": "cross0", "Square": 6, "Buttons": 1, "Cost_b": 0, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]]},
+     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]], "Color": (0, 0, 0)},
     {"ID": 16, "Name": "z5", "Square": 5, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 1, 1], [0, 1, 1]]},
+     "Shape": [[1, 1, 1], [0, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 17, "Name": "corner3", "Square": 3, "Buttons": 0, "Cost_b": 3, "Cost_t": 1, 'Weight': 0.0,
-     "Shape": [[1, 1], [0, 1]]},
+     "Shape": [[1, 1], [0, 1]], "Color": (0, 0, 0)},
     {"ID": 18, "Name": "z7", "Square": 4, "Buttons": 3, "Cost_b": 7, "Cost_t": 6, 'Weight': 0.0,
-     "Shape": [[1, 1, 0], [0, 1, 1]]},
+     "Shape": [[1, 1, 0], [0, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 19, "Name": "corner1", "Square": 3, "Buttons": 0, "Cost_b": 1, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[1, 1], [0, 1]]},
+     "Shape": [[1, 1], [0, 1]], "Color": (0, 0, 0)},
     {"ID": 20, "Name": "corner4", "Square": 5, "Buttons": 1, "Cost_b": 3, "Cost_t": 4, 'Weight': 0.0,
-     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1]]},
+     "Shape": [[0, 1, 0, 0], [1, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 21, "Name": "long_z", "Square": 5, "Buttons": 1, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[1, 1, 0, 0], [0, 1, 1, 1]]},
+     "Shape": [[1, 1, 0, 0], [0, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 22, "Name": "big_t", "Square": 6, "Buttons": 2, "Cost_b": 7, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [1, 0, 0, 0]]},
+     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [1, 0, 0, 0]], "Color": (0, 0, 0)},
     {"ID": 23, "Name": "small_t", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 5, 'Weight': 0.0,
-     "Shape": [[1, 0, 0], [1, 1, 1], [1, 0, 0]]},
+     "Shape": [[1, 0, 0], [1, 1, 1], [1, 0, 0]], "Color": (0, 0, 0)},
     {"ID": 24, "Name": "huge_z", "Square": 6, "Buttons": 0, "Cost_b": 1, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 1]]},
+     "Shape": [[1, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 25, "Name": "line2", "Square": 2, "Buttons": 0, "Cost_b": 2, "Cost_t": 1, 'Weight': 0.0,
-     "Shape": [[1, 1]]},
+     "Shape": [[1, 1]], "Color": (0, 0, 0)},
     {"ID": 26, "Name": "trapezia2", "Square": 4, "Buttons": 0, "Cost_b": 2, "Cost_t": 2, 'Weight': 0.0,
-     "Shape": [[0, 1, 0], [1, 1, 1]]},
+     "Shape": [[0, 1, 0], [1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 27, "Name": "H", "Square": 7, "Buttons": 0, "Cost_b": 2, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[1, 0, 1], [1, 1, 1], [1, 0, 1]]},
+     "Shape": [[1, 0, 1], [1, 1, 1], [1, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 28, "Name": "trapezia8", "Square": 8, "Buttons": 1, "Cost_b": 5, "Cost_t": 3, 'Weight': 0.0,
-     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]]},
+     "Shape": [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]], "Color": (0, 0, 0)},
     {"ID": 29, "Name": "corner6", "Square": 6, "Buttons": 3, "Cost_b": 10, "Cost_t": 5, 'Weight': 0.0,
-     "Shape": [[1, 1, 1, 1], [0, 0, 1, 1]]},
+     "Shape": [[1, 1, 1, 1], [0, 0, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 30, "Name": "long_n", "Square": 6, "Buttons": 1, "Cost_b": 1, "Cost_t": 5, 'Weight': 0.0,
-     "Shape": [[1, 0, 0, 1], [1, 1, 1, 1]]},
+     "Shape": [[1, 0, 0, 1], [1, 1, 1, 1]], "Color": (0, 0, 0)},
     {"ID": 31, "Name": "zz", "Square": 6, "Buttons": 2, "Cost_b": 3, "Cost_t": 6, 'Weight': 0.0,
-     "Shape": [[0, 1, 0], [1, 1, 1], [1, 0, 1]]},
+     "Shape": [[0, 1, 0], [1, 1, 1], [1, 0, 1]], "Color": (0, 0, 0)},
     {"ID": 32, "Name": "cross5", "Square": 5, "Buttons": 2, "Cost_b": 5, "Cost_t": 4, 'Weight': 0.0,
-     "Shape": [[0, 1, 0], [1, 1, 1], [0, 1, 0]]},
+     "Shape": [[0, 1, 0], [1, 1, 1], [0, 1, 0]], "Color": (0, 0, 0)},
 ]
+for tile_id in TILES:
+    tile_info = patchwork_pieces[tile_id]
+    tile_info['Color'] = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
 
 
 class Game:
-    def __init__(self, visual, tiles):
+    def __init__(self, visual):
         self.id = uuid.uuid4().hex
         self.visual = visual
         self.patches = [26, 32, 38, 44, 50]
         self.timeline = np.arange(1, 54)
         self.player1 = Player(1)
         self.player2 = Player(2)
-        self.tiles = tiles_shuffle(tiles)
+        self.tiles = tiles_shuffle(TILES)
+        self.sc = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+
+    def visual_run(self):
+        pygame.init()
+        pro_version = "1.0.0"
+        pygame.display.set_caption("Patchwork MNG " + pro_version)
+        # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
+        clock = pygame.time.Clock()
+        fps = 60
+        tile_size = 7  # tile size
+        margin = 1  # margin between tiles
+        x, y = 50, 10  # initial coordinates
+
+        # draw game patches (tiles)
+        for idx, tile_id in enumerate(self.tiles):
+            tile_info = patchwork_pieces[tile_id]
+            shape = tile_info["Shape"]
+            t_color = tile_info["Color"]
+            for row_idx, row_cell in enumerate(shape):
+                for col_idx, cell in enumerate(row_cell):
+                    if cell == 1:
+                        tile_rect = pygame.Rect(x + col_idx * tile_size, y + row_idx * tile_size, tile_size, tile_size)
+                        pygame.draw.rect(self.sc, t_color, tile_rect)
+            x += (len(shape[0]) * (tile_size + margin))
+
+        pygame.draw.rect(self.sc, WHITE, (48, 68, 274, 274), 2)
+        pygame.draw.rect(self.sc, WHITE, (348, 68, 274, 274), 2)
+        draw_tile(self.player1.field, 'Grey', 50, 70, 30, self.sc)
+        draw_tile(self.player2.field, 'Grey', 350, 70, 30, self.sc)
+        pygame.display.update()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        exit()
+
+            clock.tick(fps)
 
 
 class Player:
@@ -212,6 +258,16 @@ def calc_game_results(player1, player2, player):
             p2_result) + "\nПобедил игрок 2!")
 
 
+def draw_tile(shape, color, x, y, tile_size, surface):
+    for row_idx, row_cell in enumerate(shape):
+        for col_idx, cell in enumerate(row_cell):
+            if cell == 1:
+                tile_rect = pygame.Rect(x + col_idx * tile_size, y + row_idx * tile_size, tile_size,
+                                        tile_size)
+                pygame.draw.rect(surface, color, tile_rect)
+    x += (len(shape[0]) * (tile_size + 1))
+
+
 def emulate_game():
     player1 = Player(1)
     player2 = Player(2)
@@ -221,7 +277,7 @@ def emulate_game():
     player = 1
     while player1.time_count + player2.time_count > 0:
         if player == 1:
-            print(tiles)
+            # print(tiles)
             while player1.time_count >= player2.time_count:
                 n = 0
                 # Player 1 uses greedy sorting
@@ -299,32 +355,9 @@ def emulate_game():
     print(print_board(player2.field))
 
 
-def visual_run():
-    pygame.init()
-    pro_version = "1.0.0"
-    sc = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
-    pygame.display.set_caption("Patchwork MNG " + pro_version)
-    # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
-    clock = pygame.time.Clock()
-    fps = 60
-    # WHITE = (255, 255, 255)
-
-    player1_board = pygame.Surface((270, 270))
-    player2_board = pygame.Surface((270, 270))
-    player1_board.fill('Grey')
-    player2_board.fill('Grey')
-    sc.blit(player1_board, (50, 50))
-    sc.blit(player2_board, (350, 50))
-    pygame.display.update()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
-        clock.tick(fps)
-
 if __name__ == '__main__':
     if VISUAL is True:
-        visual_run()
+        game = Game(VISUAL)
+        Game.visual_run(game)
     else:
         emulate_game()
