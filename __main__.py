@@ -3,12 +3,12 @@ import math
 import pygame
 import uuid
 import random
+import time
 
 # Mode
 VISUAL = True
 RANDOM = True
 TILES = np.arange(0, 33)
-WHITE = (255, 255, 255)
 
 # Bonus patches on the game timeline
 PATCHES = [26, 32, 38, 44, 50]
@@ -85,13 +85,13 @@ patchwork_pieces = [
 ]
 for tile_id in TILES:
     tile_info = patchwork_pieces[tile_id]
-    tile_info['Color'] = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
+    tile_info['Color'] = (random.randint(25, 225), random.randint(25, 225), random.randint(25, 225))
 
 
 class Game:
-    def __init__(self, visual):
+    def __init__(self):
         self.id = uuid.uuid4().hex
-        self.visual = visual
+        self.visual = VISUAL
         self.patches = [26, 32, 38, 44, 50]
         self.timeline = np.arange(1, 54)
         self.player1 = Player(1)
@@ -106,27 +106,28 @@ class Game:
         # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
         clock = pygame.time.Clock()
         fps = 60
+        game_font = pygame.font.SysFont('Calibri', 14)
         tile_size = 7  # tile size
         margin = 1  # margin between tiles
         x, y = 50, 10  # initial coordinates
 
         # draw game patches (tiles)
-        for idx, tile_id in enumerate(self.tiles):
-            tile_info = patchwork_pieces[tile_id]
-            shape = tile_info["Shape"]
-            t_color = tile_info["Color"]
-            for row_idx, row_cell in enumerate(shape):
-                for col_idx, cell in enumerate(row_cell):
-                    if cell == 1:
-                        tile_rect = pygame.Rect(x + col_idx * tile_size, y + row_idx * tile_size, tile_size, tile_size)
-                        pygame.draw.rect(self.sc, t_color, tile_rect)
+        for idx, i in enumerate(self.tiles):
+            tile = patchwork_pieces[i]
+            shape = tile["Shape"]
+            draw_tile(tile["Shape"], tile["Color"], x, 10, tile_size, self.sc)
+            pygame.display.update()
             x += (len(shape[0]) * (tile_size + margin))
 
-        pygame.draw.rect(self.sc, WHITE, (48, 68, 274, 274), 2)
-        pygame.draw.rect(self.sc, WHITE, (348, 68, 274, 274), 2)
-        draw_tile(self.player1.field, 'Grey', 50, 70, 30, self.sc)
-        draw_tile(self.player2.field, 'Grey', 350, 70, 30, self.sc)
+        pygame.draw.rect(self.sc, 'White', (48, 68, 274, 274), 2)
+        pygame.draw.rect(self.sc, 'White', (348, 68, 274, 274), 2)
+        p1_signboard = game_font.render('Player 1', 1, "White")
+        p2_signboard = game_font.render('Player 2', 1, "White")
+        self.sc.blit(p1_signboard, (48, 48))
+        self.sc.blit(p2_signboard, (348, 48))
         pygame.display.update()
+
+        emulate_game(self.player1, self.player2, self)
 
         while True:
             for event in pygame.event.get():
@@ -147,9 +148,10 @@ class Player:
         self.buttons = 5
         self.tiles = []
         self.field = np.zeros((9, 9), dtype=int)
+        self.field_to_draw = np.zeros((9, 9), dtype=int)
         self.square = 0
 
-    def place_tile(self, tile):
+    def place_tile(self, tile, color, surface):
         # mirroring
         for _ in range(2):
             # for each rotate position
@@ -163,6 +165,14 @@ class Player:
                             # check if it is possible to place
                             if np.all(self.field[row:row + tile_rows, col:col + tile_cols][mask] == 0):
                                 self.field[row:row + tile_rows, col:col + tile_cols] += tile
+                                self.field_to_draw[row:row + tile_rows, col:col + tile_cols] += tile
+                                if VISUAL:
+                                    if self.number == 1:
+                                        draw_tile(self.field_to_draw, color, 50, 70, 30, surface)
+                                    else:
+                                        draw_tile(self.field_to_draw, color, 350, 70, 30, surface)
+                                    self.field_to_draw[row:row + tile_rows, col:col + tile_cols] -= tile
+                                    pygame.display.update()
                                 return not None
                 # rotate 90 degrees
                 tile = np.rot90(tile)
@@ -199,7 +209,7 @@ class Player:
         for tn in timeline[(53 - self.time_count):(53 - self.time_count + time_cost)]:
             if tn in PATCHES:  # Check if the player time position is an aimed button position
                 self.square += 1
-                Player.place_tile(self, np.array([[1]]))
+                Player.place_tile(self, np.array([[1]]), 'White', surface=game.sc)
                 Player.print_turn_results(self, "99", "-", "-")
                 PATCHES = np.delete(PATCHES, 0)
 
@@ -262,20 +272,18 @@ def draw_tile(shape, color, x, y, tile_size, surface):
     for row_idx, row_cell in enumerate(shape):
         for col_idx, cell in enumerate(row_cell):
             if cell == 1:
-                tile_rect = pygame.Rect(x + col_idx * tile_size, y + row_idx * tile_size, tile_size,
-                                        tile_size)
+                tile_rect = pygame.Rect(x + col_idx * tile_size, y + row_idx * tile_size, tile_size, tile_size)
                 pygame.draw.rect(surface, color, tile_rect)
     x += (len(shape[0]) * (tile_size + 1))
 
 
-def emulate_game():
-    player1 = Player(1)
-    player2 = Player(2)
+def emulate_game(player1, player2, game):
     # patches order
-    tiles = tiles_shuffle(TILES)
+    tiles = game.tiles
 
     player = 1
     while player1.time_count + player2.time_count > 0:
+        # time.sleep(0.15)
         if player == 1:
             # print(tiles)
             while player1.time_count >= player2.time_count:
@@ -287,7 +295,7 @@ def emulate_game():
                     tile = patchwork_pieces[i]
                     tile_to_place = np.array(tile['Shape'])
                     if (player1.buttons >= tile['Cost_b'] and player1.time_count > 0
-                            and player1.place_tile(tile_to_place) is not None):
+                            and game.player1.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
                         player1.tiles.append(tile)
                         tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
                         tiles = tiles[1::]
@@ -323,7 +331,7 @@ def emulate_game():
                     tile = patchwork_pieces[i]
                     tile_to_place = np.array(tile['Shape'])
                     if (player2.buttons >= tile['Cost_b'] and player2.time_count > 0
-                            and player2.place_tile(tile_to_place) is not None):
+                            and game.player2.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
                         player2.tiles.append(tile)
                         tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
                         tiles = tiles[1::]
@@ -351,13 +359,14 @@ def emulate_game():
     print(tiles)
     print(calc_game_results(player1, player2, player))
 
-    print(print_board(player1.field))
-    print(print_board(player2.field))
+    print(print_board(game.player1.field))
+    print(print_board(game.player2.field))
 
 
 if __name__ == '__main__':
     if VISUAL is True:
-        game = Game(VISUAL)
+        game = Game()
         Game.visual_run(game)
     else:
-        emulate_game()
+        game = Game()
+        emulate_game(Player(1), Player(2), game)
