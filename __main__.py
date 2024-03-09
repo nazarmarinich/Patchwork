@@ -7,7 +7,7 @@ import time
 
 # Mode
 VISUAL = True
-RANDOM = True
+RANDOM = False
 TILES = np.arange(0, 33)
 
 # Bonus patches on the game timeline
