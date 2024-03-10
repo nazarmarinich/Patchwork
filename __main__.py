@@ -1,3 +1,5 @@
+from typing import Type
+
 import numpy as np
 import math
 import pygame
@@ -89,6 +91,7 @@ for tile_id in TILES:
 
 
 class Game:
+
     def __init__(self):
         self.id = uuid.uuid4().hex
         self.visual = VISUAL
@@ -98,15 +101,115 @@ class Game:
         self.player2 = Player(2)
         self.tiles = tiles_shuffle(TILES)
         self.sc = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+        self.game_result = Type[str]
+
+    def calc_game_results(self, player):
+        p1_result = self.player1.buttons - (81 - min(self.player1.square, 81)) * 2
+        p2_result = self.player2.buttons - (81 - min(self.player2.square, 81)) * 2
+        if p1_result > p2_result:
+            game_result = "\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+                p2_result) + "\nПобедил игрок 1!"
+        elif p1_result == p2_result and player == 1:
+            game_result = "\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+                p2_result) + "\nПобедил игрок 1!"
+        else:
+            game_result = "\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
+                p2_result) + "\nПобедил игрок 2!"
+        print(game_result)
+        self.game_result = game_result.replace('\n', '  ')
+
+    def emulate_game(self):
+        # patches order
+        tiles = self.tiles
+
+        player = 1
+        while self.player1.time_count + self.player2.time_count > 0:
+            # time.sleep(0.15)
+            if player == 1:
+                # print(tiles)
+                while self.player1.time_count >= self.player2.time_count:
+                    n = 0
+                    # Player 1 uses greedy sorting
+                    tiles_s = self.player1.greedy_sorting(tiles[0:3])
+                    for i in tiles_s[0:3]:
+                        # for i in tiles[0:3]:
+                        tile = patchwork_pieces[i]
+                        tile_to_place = np.array(tile['Shape'])
+                        if (self.player1.buttons >= tile['Cost_b'] and self.player1.time_count > 0
+                                and self.player1.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
+                            self.player1.tiles.append(tile)
+                            tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
+                            tiles = tiles[1::]
+                            # print(tiles)
+                            self.player1.buttons -= tile['Cost_b']
+                            self.player1.buttons_aimed += tile['Buttons']
+                            self.player1.square += tile['Square']
+                            self.player1.calc_aimed_patch(tile['Cost_t'])
+                            self.player1.calc_aimed_buttons(tile['Cost_t'])
+                            self.player1.time_count -= tile['Cost_t']
+                            self.player1.print_turn_results(tile['ID'], tile['Cost_b'], tile['Cost_t'])
+                            if self.player1.time_count < self.player2.time_count:
+                                player = 2
+                            break
+                        if n == 2 and self.player1.time_count >= self.player2.time_count:
+                            a = (self.player1.time_count - self.player2.time_count + 1)
+                            self.player1.buttons += a
+                            self.player1.calc_aimed_patch(a)
+                            self.player1.calc_aimed_buttons(a)
+                            self.player1.time_count -= a
+                            self.player1.print_turn_results("-", "-", "-")
+                            player = 2
+                            break
+                        n += 1
+            else:
+                # print(tiles)
+                while self.player2.time_count >= self.player1.time_count:
+                    n = 0
+                    # Player 2 uses greedy sorting
+                    # tiles_s = self.player1.greedy_sorting(tiles[0:3])
+                    # for i in tiles_s[0:3]:
+                    for i in tiles[0:3]:
+                        tile = patchwork_pieces[i]
+                        tile_to_place = np.array(tile['Shape'])
+                        if (self.player2.buttons >= tile['Cost_b'] and self.player2.time_count > 0
+                                and self.player2.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
+                            self.player2.tiles.append(tile)
+                            tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
+                            tiles = tiles[1::]
+                            # print(tiles)
+                            self.player2.buttons -= tile['Cost_b']
+                            self.player2.buttons_aimed += tile['Buttons']
+                            self.player2.square += tile['Square']
+                            self.player2.calc_aimed_patch(tile['Cost_t'])
+                            self.player2.calc_aimed_buttons(tile['Cost_t'])
+                            self.player2.time_count -= tile['Cost_t']
+                            self.player2.print_turn_results(tile['ID'], tile['Cost_b'], tile['Cost_t'])
+                            if self.player2.time_count < self.player1.time_count:
+                                player = 1
+                            break
+                        if n == 2 and self.player2.time_count >= self.player1.time_count:
+                            a = (self.player2.time_count - self.player1.time_count + 1)
+                            self.player2.buttons += a
+                            self.player2.calc_aimed_patch(a)
+                            self.player2.calc_aimed_buttons(a)
+                            self.player2.time_count -= a
+                            self.player2.print_turn_results("-", "-", "-")
+                            player = 1
+                            break
+                        n += 1
+        print(tiles)
+        print(Game.calc_game_results(self, player))
+
+        print(print_board(self.player1.field))
+        print(print_board(self.player2.field))
 
     def visual_run(self):
         pygame.init()
         pro_version = "1.0.0"
         pygame.display.set_caption("Patchwork MNG " + pro_version)
-        # pygame.display.set_icon(pygame.image.load("pics/patchwork_icon.jpg"))
         clock = pygame.time.Clock()
         fps = 60
-        game_font = pygame.font.SysFont('Calibri', 14)
+        game_font = pygame.font.SysFont('Calibri', 16)
         tile_size = 7  # tile size
         margin = 1  # margin between tiles
         x, y = 50, 10  # initial coordinates
@@ -127,7 +230,11 @@ class Game:
         self.sc.blit(p2_signboard, (348, 48))
         pygame.display.update()
 
-        emulate_game(self.player1, self.player2, self)
+        self.emulate_game()
+
+        visual_game_result = game_font.render(self.game_result, 1, "White")
+        self.sc.blit(visual_game_result, (48, 348))
+        pygame.display.update()
 
         while True:
             for event in pygame.event.get():
@@ -228,12 +335,12 @@ class Player:
             if tn % 6 == 5:  # Check if the player time position is an aimed button position
                 self.buttons += self.buttons_aimed
 
-    def print_turn_results(self, tile, buttons, time):
+    def print_turn_results(self, tile, buttons, time_spent):
         # Print the player actions
 
         print("Игрок: " + str(self.number) + " BB:" + str(self.buttons) + "/" + str(self.buttons_aimed) + " BT:"
               + str(self.time_count) + " Square: " + str(self.square) + " Buttons: "
-              + str(buttons) + " Time: " + str(time) + " Tile: " + str(tile))
+              + str(buttons) + " Time: " + str(time_spent) + " Tile: " + str(tile))
 
 
 # _______________functions _______________________
@@ -254,20 +361,6 @@ def print_board(board):
         print("  ".join(str(cell) for cell in row))
 
 
-def calc_game_results(player1, player2, player):
-    p1_result = player1.buttons - (81 - min(player1.square, 81)) * 2
-    p2_result = player2.buttons - (81 - min(player2.square, 81)) * 2
-    if p1_result > p2_result:
-        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
-            p2_result) + "\nПобедил игрок 1!")
-    elif p1_result == p2_result and player == 1:
-        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
-            p2_result) + "\nПобедил игрок 1!")
-    else:
-        print("\nРезультат игрока 1: " + str(p1_result) + "\nРезультат игрока 2: " + str(
-            p2_result) + "\nПобедил игрок 2!")
-
-
 def draw_tile(shape, color, x, y, tile_size, surface):
     for row_idx, row_cell in enumerate(shape):
         for col_idx, cell in enumerate(row_cell):
@@ -277,96 +370,10 @@ def draw_tile(shape, color, x, y, tile_size, surface):
     x += (len(shape[0]) * (tile_size + 1))
 
 
-def emulate_game(player1, player2, game):
-    # patches order
-    tiles = game.tiles
-
-    player = 1
-    while player1.time_count + player2.time_count > 0:
-        # time.sleep(0.15)
-        if player == 1:
-            # print(tiles)
-            while player1.time_count >= player2.time_count:
-                n = 0
-                # Player 1 uses greedy sorting
-                tiles_s = player1.greedy_sorting(tiles[0:3])
-                for i in tiles_s[0:3]:
-                    # for i in tiles[0:3]:
-                    tile = patchwork_pieces[i]
-                    tile_to_place = np.array(tile['Shape'])
-                    if (player1.buttons >= tile['Cost_b'] and player1.time_count > 0
-                            and game.player1.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
-                        player1.tiles.append(tile)
-                        tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
-                        tiles = tiles[1::]
-                        # print(tiles)
-                        player1.buttons -= tile['Cost_b']
-                        player1.buttons_aimed += tile['Buttons']
-                        player1.square += tile['Square']
-                        player1.calc_aimed_patch(tile['Cost_t'])
-                        player1.calc_aimed_buttons(tile['Cost_t'])
-                        player1.time_count -= tile['Cost_t']
-                        player1.print_turn_results(tile['ID'], tile['Cost_b'], tile['Cost_t'])
-                        if player1.time_count < player2.time_count:
-                            player = 2
-                        break
-                    if n == 2 and player1.time_count >= player2.time_count:
-                        a = (player1.time_count - player2.time_count + 1)
-                        player1.buttons += a
-                        player1.calc_aimed_patch(a)
-                        player1.calc_aimed_buttons(a)
-                        player1.time_count -= a
-                        player1.print_turn_results("-", "-", "-")
-                        player = 2
-                        break
-                    n += 1
-        else:
-            # print(tiles)
-            while player2.time_count >= player1.time_count:
-                n = 0
-                # Player 2 uses greedy sorting
-                # tiles_s = player1.greedy_sorting(tiles[0:3])
-                # for i in tiles_s[0:3]:
-                for i in tiles[0:3]:
-                    tile = patchwork_pieces[i]
-                    tile_to_place = np.array(tile['Shape'])
-                    if (player2.buttons >= tile['Cost_b'] and player2.time_count > 0
-                            and game.player2.place_tile(tile_to_place, tile['Color'], game.sc) is not None):
-                        player2.tiles.append(tile)
-                        tiles = np.roll(tiles, -np.where(tiles == i)[0][0])
-                        tiles = tiles[1::]
-                        # print(tiles)
-                        player2.buttons -= tile['Cost_b']
-                        player2.buttons_aimed += tile['Buttons']
-                        player2.square += tile['Square']
-                        player2.calc_aimed_patch(tile['Cost_t'])
-                        player2.calc_aimed_buttons(tile['Cost_t'])
-                        player2.time_count -= tile['Cost_t']
-                        player2.print_turn_results(tile['ID'], tile['Cost_b'], tile['Cost_t'])
-                        if player2.time_count < player1.time_count:
-                            player = 1
-                        break
-                    if n == 2 and player2.time_count >= player1.time_count:
-                        a = (player2.time_count - player1.time_count + 1)
-                        player2.buttons += a
-                        player2.calc_aimed_patch(a)
-                        player2.calc_aimed_buttons(a)
-                        player2.time_count -= a
-                        player2.print_turn_results("-", "-", "-")
-                        player = 1
-                        break
-                    n += 1
-    print(tiles)
-    print(calc_game_results(player1, player2, player))
-
-    print(print_board(game.player1.field))
-    print(print_board(game.player2.field))
-
-
 if __name__ == '__main__':
     if VISUAL is True:
         game = Game()
         Game.visual_run(game)
     else:
         game = Game()
-        emulate_game(Player(1), Player(2), game)
+        game.emulate_game()
