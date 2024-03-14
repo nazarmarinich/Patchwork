@@ -9,7 +9,7 @@ import time
 
 # Mode
 VISUAL = True
-RANDOM = False
+RANDOM = True
 TILES = np.arange(0, 33)
 
 # Bonus patches on the game timeline
@@ -222,8 +222,8 @@ class Game:
             pygame.display.update()
             x += (len(shape[0]) * (tile_size + margin))
 
-        pygame.draw.rect(self.sc, 'White', (48, 68, 274, 274), 2)
-        pygame.draw.rect(self.sc, 'White', (348, 68, 274, 274), 2)
+        pygame.draw.rect(self.sc, 'White', (48, 68, 278, 278), 4)
+        pygame.draw.rect(self.sc, 'White', (348, 68, 278, 278), 4)
         p1_signboard = game_font.render('Player 1', 1, "White")
         p2_signboard = game_font.render('Player 2', 1, "White")
         self.sc.blit(p1_signboard, (48, 48))
